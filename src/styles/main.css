@@ -1,0 +1,919 @@
+@layer reset, tokens, base, layout, components, utilities;
+
+/* Scroll fade custom properties for horizontal tablists (modern-web-guidance: tabs) */
+@property --fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-block-start: 5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer tokens {
+  :root {
+    /* Base color scheme follows OS preference; meta tag overrides via :has() below */
+    color-scheme: light dark;
+
+    /* Typography families */
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* Raw light & dark palettes (Warm academic paper vs restful deep slate) */
+    --bg-canvas-light: #FAF9F6;
+    --bg-canvas-dark: #0F1419;
+
+    --bg-surface-light: #FFFFFF;
+    --bg-surface-dark: #161D24;
+
+    --bg-elevated-light: #F3F1EC;
+    --bg-elevated-dark: #1D2630;
+
+    --bg-subtle-light: #EAE6DD;
+    --bg-subtle-dark: #24303D;
+
+    --ink-primary-light: #1C1917;
+    --ink-primary-dark: #E7E5E4;
+
+    --ink-secondary-light: #44403C;
+    --ink-secondary-dark: #B6B3AE;
+
+    --ink-muted-light: #6B6560;
+    --ink-muted-dark: #8E959E;
+
+    --border-subtle-light: #E4E0D8;
+    --border-subtle-dark: #273340;
+
+    --border-strong-light: #CFC9BE;
+    --border-strong-dark: #384758;
+
+    /* Semantic domain accents: Micro (Indigo/Cobalt), Macro (Emerald/Teal), Trap (Amber), Warning/DWL (Rose) */
+    --micro-light: #3730A3;
+    --micro-dark: #818CF8;
+    --micro-soft-light: #EEF2FF;
+    --micro-soft-dark: #1E2342;
+    --micro-border-light: #C7D2FE;
+    --micro-border-dark: #373E73;
+
+    --macro-light: #0F766E;
+    --macro-dark: #2DD4BF;
+    --macro-soft-light: #F0FDFA;
+    --macro-soft-dark: #112A2B;
+    --macro-border-light: #99F6E4;
+    --macro-border-dark: #1E4E4E;
+
+    --trap-light: #B45309;
+    --trap-dark: #FBBF24;
+    --trap-soft-light: #FFFBEB;
+    --trap-soft-dark: #2B2111;
+    --trap-border-light: #FDE68A;
+    --trap-border-dark: #5B4318;
+
+    --rose-light: #BE123C;
+    --rose-dark: #FB7185;
+    --rose-soft-light: #FFF1F2;
+    --rose-soft-dark: #2F151C;
+    --rose-border-light: #FECDD3;
+    --rose-border-dark: #632433;
+
+    --tip-light: #1D4ED8;
+    --tip-dark: #60A5FA;
+    --tip-soft-light: #EFF6FF;
+    --tip-soft-dark: #15233B;
+    --tip-border-light: #BFDBFE;
+    --tip-border-dark: #25406B;
+
+    --success-light: #15803D;
+    --success-dark: #4ADE80;
+    --success-soft-light: #F0FDF4;
+    --success-soft-dark: #132A1C;
+
+    --btn-on-accent-light: #FFFFFF;
+    --btn-on-accent-dark: #0F1419;
+
+    --scrollbar-track-light: #EFECE6;
+    --scrollbar-track-dark: #141B22;
+    --scrollbar-thumb-light: #9E978D;
+    --scrollbar-thumb-dark: #4B5B6B;
+
+    --shadow-sm-light: 0 1px 2px rgb(28 25 23 / 0.06);
+    --shadow-sm-dark: 0 1px 3px rgb(0 0 0 / 0.35);
+    --shadow-md-light: 0 8px 24px -6px rgb(28 25 23 / 0.1);
+    --shadow-md-dark: 0 10px 28px -6px rgb(0 0 0 / 0.5);
+
+    /* Fallback defaults (light) for browsers without light-dark() */
+    --bg-canvas: var(--bg-canvas-light);
+    --bg-surface: var(--bg-surface-light);
+    --bg-elevated: var(--bg-elevated-light);
+    --bg-subtle: var(--bg-subtle-light);
+    --ink-primary: var(--ink-primary-light);
+    --ink-secondary: var(--ink-secondary-light);
+    --ink-muted: var(--ink-muted-light);
+    --border-subtle: var(--border-subtle-light);
+    --border-strong: var(--border-strong-light);
+
+    --color-micro: var(--micro-light);
+    --color-micro-soft: var(--micro-soft-light);
+    --color-micro-border: var(--micro-border-light);
+
+    --color-macro: var(--macro-light);
+    --color-macro-soft: var(--macro-soft-light);
+    --color-macro-border: var(--macro-border-light);
+
+    --color-trap: var(--trap-light);
+    --color-trap-soft: var(--trap-soft-light);
+    --color-trap-border: var(--trap-border-light);
+
+    --color-rose: var(--rose-light);
+    --color-rose-soft: var(--rose-soft-light);
+    --color-rose-border: var(--rose-border-light);
+
+    --color-tip: var(--tip-light);
+    --color-tip-soft: var(--tip-soft-light);
+    --color-tip-border: var(--tip-border-light);
+
+    --color-success: var(--success-light);
+    --color-success-soft: var(--success-soft-light);
+    --btn-on-accent: var(--btn-on-accent-light);
+
+    --scrollbar-track: var(--scrollbar-track-light);
+    --scrollbar-thumb: var(--scrollbar-thumb-light);
+    --shadow-sm: var(--shadow-sm-light);
+    --shadow-md: var(--shadow-md-light);
+
+    /* Fallback media query for browsers without light-dark() */
+    @media (prefers-color-scheme: dark) {
+      --bg-canvas: var(--bg-canvas-dark);
+      --bg-surface: var(--bg-surface-dark);
+      --bg-elevated: var(--bg-elevated-dark);
+      --bg-subtle: var(--bg-subtle-dark);
+      --ink-primary: var(--ink-primary-dark);
+      --ink-secondary: var(--ink-secondary-dark);
+      --ink-muted: var(--ink-muted-dark);
+      --border-subtle: var(--border-subtle-dark);
+      --border-strong: var(--border-strong-dark);
+
+      --color-micro: var(--micro-dark);
+      --color-micro-soft: var(--micro-soft-dark);
+      --color-micro-border: var(--micro-border-dark);
+
+      --color-macro: var(--macro-dark);
+      --color-macro-soft: var(--macro-soft-dark);
+      --color-macro-border: var(--macro-border-dark);
+
+      --color-trap: var(--trap-dark);
+      --color-trap-soft: var(--trap-soft-dark);
+      --color-trap-border: var(--trap-border-dark);
+
+      --color-rose: var(--rose-dark);
+      --color-rose-soft: var(--rose-soft-dark);
+      --color-rose-border: var(--rose-border-dark);
+
+      --color-tip: var(--tip-dark);
+      --color-tip-soft: var(--tip-soft-dark);
+      --color-tip-border: var(--tip-border-dark);
+
+      --color-success: var(--success-dark);
+      --color-success-soft: var(--success-soft-dark);
+      --btn-on-accent: var(--btn-on-accent-dark);
+
+      --scrollbar-track: var(--scrollbar-track-dark);
+      --scrollbar-thumb: var(--scrollbar-thumb-dark);
+      --shadow-sm: var(--shadow-sm-dark);
+      --shadow-md: var(--shadow-md-dark);
+    }
+
+    /* Progressive enhancement: automatic light-dark() tokens keyed off computed color-scheme */
+    @supports (color: light-dark(white, black)) {
+      --bg-canvas: light-dark(var(--bg-canvas-light), var(--bg-canvas-dark));
+      --bg-surface: light-dark(var(--bg-surface-light), var(--bg-surface-dark));
+      --bg-elevated: light-dark(var(--bg-elevated-light), var(--bg-elevated-dark));
+      --bg-subtle: light-dark(var(--bg-subtle-light), var(--bg-subtle-dark));
+      --ink-primary: light-dark(var(--ink-primary-light), var(--ink-primary-dark));
+      --ink-secondary: light-dark(var(--ink-secondary-light), var(--ink-secondary-dark));
+      --ink-muted: light-dark(var(--ink-muted-light), var(--ink-muted-dark));
+      --border-subtle: light-dark(var(--border-subtle-light), var(--border-subtle-dark));
+      --border-strong: light-dark(var(--border-strong-light), var(--border-strong-dark));
+
+      --color-micro: light-dark(var(--micro-light), var(--micro-dark));
+      --color-micro-soft: light-dark(var(--micro-soft-light), var(--micro-soft-dark));
+      --color-micro-border: light-dark(var(--micro-border-light), var(--micro-border-dark));
+
+      --color-macro: light-dark(var(--macro-light), var(--macro-dark));
+      --color-macro-soft: light-dark(var(--macro-soft-light), var(--macro-soft-dark));
+      --color-macro-border: light-dark(var(--macro-border-light), var(--macro-border-dark));
+
+      --color-trap: light-dark(var(--trap-light), var(--trap-dark));
+      --color-trap-soft: light-dark(var(--trap-soft-light), var(--trap-soft-dark));
+      --color-trap-border: light-dark(var(--trap-border-light), var(--trap-border-dark));
+
+      --color-rose: light-dark(var(--rose-light), var(--rose-dark));
+      --color-rose-soft: light-dark(var(--rose-soft-light), var(--rose-soft-dark));
+      --color-rose-border: light-dark(var(--rose-border-light), var(--rose-border-dark));
+
+      --color-tip: light-dark(var(--tip-light), var(--tip-dark));
+      --color-tip-soft: light-dark(var(--tip-soft-light), var(--tip-soft-dark));
+      --color-tip-border: light-dark(var(--tip-border-light), var(--tip-border-dark));
+
+      --color-success: light-dark(var(--success-light), var(--success-dark));
+      --color-success-soft: light-dark(var(--success-soft-light), var(--success-soft-dark));
+      --btn-on-accent: light-dark(var(--btn-on-accent-light), var(--btn-on-accent-dark));
+
+      --scrollbar-track: light-dark(var(--scrollbar-track-light), var(--scrollbar-track-dark));
+      --scrollbar-thumb: light-dark(var(--scrollbar-thumb-light), var(--scrollbar-thumb-dark));
+    }
+
+    /* Map <meta name="color-scheme"> override back to CSS color-scheme (modern-web-guidance: dark-mode-toggle) */
+    &:has(> head > meta[name="color-scheme"][content="dark"]) {
+      color-scheme: dark;
+      --shadow-sm: var(--shadow-sm-dark);
+      --shadow-md: var(--shadow-md-dark);
+    }
+
+    &:has(> head > meta[name="color-scheme"][content="light"]) {
+      color-scheme: light;
+      --shadow-sm: var(--shadow-sm-light);
+      --shadow-md: var(--shadow-md-light);
+    }
+
+    /* Native browser UI adaptation */
+    accent-color: var(--color-micro);
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+    /* Layout & reading scale tokens (rem-based, never px for typography) */
+    --sidebar-width: 17.5rem;
+    --topbar-height: 3.75rem;
+    --reading-measure: 70ch;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --font-scale-factor: 1;
+  }
+
+  /* Student-friendly larger reading font mode */
+  :root[data-font-scale="large"] {
+    --font-scale-factor: 1.14;
+  }
+
+  /* Fallback explicit meta overrides for browsers without light-dark() */
+  @supports not (color: light-dark(white, black)) {
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) {
+      --bg-canvas: var(--bg-canvas-dark);
+      --bg-surface: var(--bg-surface-dark);
+      --bg-elevated: var(--bg-elevated-dark);
+      --bg-subtle: var(--bg-subtle-dark);
+      --ink-primary: var(--ink-primary-dark);
+      --ink-secondary: var(--ink-secondary-dark);
+      --ink-muted: var(--ink-muted-dark);
+      --border-subtle: var(--border-subtle-dark);
+      --border-strong: var(--border-strong-dark);
+      --color-micro: var(--micro-dark);
+      --color-micro-soft: var(--micro-soft-dark);
+      --color-micro-border: var(--micro-border-dark);
+      --color-macro: var(--macro-dark);
+      --color-macro-soft: var(--macro-soft-dark);
+      --color-macro-border: var(--macro-border-dark);
+      --color-trap: var(--trap-dark);
+      --color-trap-soft: var(--trap-soft-dark);
+      --color-trap-border: var(--trap-border-dark);
+      --color-rose: var(--rose-dark);
+      --color-rose-soft: var(--rose-soft-dark);
+      --color-rose-border: var(--rose-border-dark);
+      --color-tip: var(--tip-dark);
+      --color-tip-soft: var(--tip-soft-dark);
+      --color-tip-border: var(--tip-border-dark);
+      --color-success: var(--success-dark);
+      --color-success-soft: var(--success-soft-dark);
+      --btn-on-accent: var(--btn-on-accent-dark);
+    }
+
+    :root:has(> head > meta[name="color-scheme"][content="light"]) {
+      --bg-canvas: var(--bg-canvas-light);
+      --bg-surface: var(--bg-surface-light);
+      --bg-elevated: var(--bg-elevated-light);
+      --bg-subtle: var(--bg-subtle-light);
+      --ink-primary: var(--ink-primary-light);
+      --ink-secondary: var(--ink-secondary-light);
+      --ink-muted: var(--ink-muted-light);
+      --border-subtle: var(--border-subtle-light);
+      --border-strong: var(--border-strong-light);
+      --color-micro: var(--micro-light);
+      --color-micro-soft: var(--micro-soft-light);
+      --color-micro-border: var(--micro-border-light);
+      --color-macro: var(--macro-light);
+      --color-macro-soft: var(--macro-soft-light);
+      --color-macro-border: var(--macro-border-light);
+      --color-trap: var(--trap-light);
+      --color-trap-soft: var(--trap-soft-light);
+      --color-trap-border: var(--trap-border-light);
+      --color-rose: var(--rose-light);
+      --color-rose-soft: var(--rose-soft-light);
+      --color-rose-border: var(--rose-border-light);
+      --color-tip: var(--tip-light);
+      --color-tip-soft: var(--tip-soft-light);
+      --color-tip-border: var(--tip-border-light);
+      --color-success: var(--success-light);
+      --color-success-soft: var(--success-soft-light);
+      --btn-on-accent: var(--btn-on-accent-light);
+    }
+  }
+
+  /* Non-color theme toggle icon visibility (works without JS classes) */
+  .theme-icon-to-dark {
+    display: inline-flex;
+  }
+  .theme-icon-to-light {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .theme-icon-to-dark {
+      display: none;
+    }
+    :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .theme-icon-to-light {
+      display: inline-flex;
+    }
+  }
+
+  :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-icon-to-dark {
+    display: none;
+  }
+  :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-icon-to-light {
+    display: inline-flex;
+  }
+
+  /* Legacy WebKit scrollbar fallback scoped strictly when scrollbar-color is unsupported */
+  @supports not (scrollbar-color: auto) {
+    * {
+      scrollbar-width: auto;
+    }
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 999px;
+    }
+  }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    font-size: calc(1rem * var(--font-scale-factor));
+    line-height: 1.7;
+    text-align: start;
+    color: var(--ink-primary);
+    background-color: var(--bg-canvas);
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    color: var(--ink-primary);
+    line-height: 1.25;
+    margin-block: 0;
+    letter-spacing: -0.015em;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 1.4rem + 1.35vw, 2.5rem);
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.85rem);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: clamp(1.125rem, 1.02rem + 0.4vw, 1.375rem);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  p {
+    margin-block: 0 1rem;
+    color: var(--ink-secondary);
+  }
+
+  a {
+    color: var(--color-micro);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+  }
+
+  code,
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+
+  kbd {
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.35rem;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elevated);
+    color: var(--ink-secondary);
+    line-height: 1.2;
+  }
+
+  :focus-visible {
+    outline: 2.5px solid var(--color-micro);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-micro-soft);
+    color: var(--color-micro);
+  }
+}
+
+@layer components {
+  /* Native <dialog> modal scroll containment (modern-web-guidance: dialog) */
+  dialog:modal {
+    overscroll-behavior: contain;
+  }
+
+  dialog::backdrop {
+    background: rgb(15 20 25 / 0.56);
+    backdrop-filter: blur(4px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  /* Accessible disclosure / accordion pattern (modern-web-guidance: accordion) */
+  details.study-details {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    overflow: clip;
+  }
+
+  details.study-details > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ink-primary);
+    min-block-size: 2.75rem;
+    user-select: none;
+  }
+
+  details.study-details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.study-details > summary::before {
+    content: "";
+    inline-size: 0.95em;
+    block-size: 0.95em;
+    flex-shrink: 0;
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat center / contain;
+    rotate: -90deg;
+  }
+
+  details.study-details[open] > summary::before {
+    rotate: 0deg;
+  }
+
+  details.study-details > summary:hover {
+    background: var(--bg-elevated);
+  }
+
+  details.study-details::details-content {
+    interpolate-size: allow-keywords;
+    overflow: clip;
+    contain: layout;
+  }
+
+  details.study-details:not([open])::details-content {
+    block-size: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    details.study-details > summary::before {
+      transition: rotate 0.2s ease;
+    }
+
+    details.study-details::details-content {
+      transition: block-size 0.28s ease, content-visibility 0.28s ease allow-discrete, display 0.28s ease allow-discrete;
+      transition-behavior: allow-discrete;
+    }
+  }
+
+  .study-details-body {
+    padding: 0.25rem 1.15rem 1.15rem;
+    border-block-start: 1px solid var(--border-subtle);
+  }
+
+  /* Single-row accessible tabs with scroll fade hints (modern-web-guidance: tabs) */
+  .tabs-bar {
+    display: flex;
+    align-items: stretch;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: inline proximity;
+    scroll-padding-inline: 2.5rem;
+    border-block-end: 1px solid var(--border-subtle);
+    scrollbar-width: none;
+    --fade-size: 2.5rem;
+    --fade-dir: right;
+    --fade-start-pos: 0;
+    --fade-end-pos: 100%;
+    mask:
+      linear-gradient(black, black) no-clip subtract,
+      linear-gradient(to var(--fade-dir), black, transparent) var(--fade-start-pos) 0 / var(--fade-start) 100% no-repeat no-clip,
+      linear-gradient(to var(--fade-dir), transparent, black) var(--fade-end-pos) 0 / var(--fade-end) 100% no-repeat no-clip;
+    animation: reveal-fade-start linear both, hide-fade-end linear both;
+    animation-timeline: scroll(self inline);
+    animation-range: 0 var(--fade-size), calc(100% - var(--fade-size)) 100%;
+  }
+
+  .tabs-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    position: relative;
+    flex: none;
+    scroll-snap-align: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem 1rem;
+    min-block-size: 2.75rem;
+    border: 0;
+    background: transparent;
+    color: var(--ink-muted);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  }
+
+  .tab-btn:hover {
+    color: var(--ink-primary);
+    background: var(--bg-elevated);
+  }
+
+  /* Never change padding/font-weight on selection; use border pseudo-element for Forced Colors compliance */
+  .tab-btn[aria-selected="true"] {
+    color: var(--color-micro);
+  }
+
+  .tab-btn[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    border-block-end: 3px solid currentColor;
+  }
+
+  @keyframes reveal-fade-start {
+    to {
+      --fade-start: var(--fade-size);
+    }
+  }
+
+  @keyframes hide-fade-end {
+    from {
+      --fade-end: var(--fade-size);
+    }
+  }
+
+  /* Reusable badges and pills */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.35;
+    border: 1px solid transparent;
+  }
+
+  .badge-micro {
+    background: var(--color-micro-soft);
+    color: var(--color-micro);
+    border-color: var(--color-micro-border);
+  }
+
+  .badge-macro {
+    background: var(--color-macro-soft);
+    color: var(--color-macro);
+    border-color: var(--color-macro-border);
+  }
+
+  .badge-trap {
+    background: var(--color-trap-soft);
+    color: var(--color-trap);
+    border-color: var(--color-trap-border);
+  }
+
+  .badge-rose {
+    background: var(--color-rose-soft);
+    color: var(--color-rose);
+    border-color: var(--color-rose-border);
+  }
+
+  .badge-neutral {
+    background: var(--bg-elevated);
+    color: var(--ink-secondary);
+    border-color: var(--border-subtle);
+  }
+
+  /* Reusable cards & buttons */
+  .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    min-block-size: 2.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--ink-primary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .btn:hover {
+    background: var(--bg-elevated);
+  }
+
+  .btn-primary {
+    background: var(--color-micro);
+    border-color: var(--color-micro);
+    color: var(--btn-on-accent);
+    font-weight: 600;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.08);
+    background: var(--color-micro);
+  }
+
+  .btn-macro {
+    background: var(--color-macro);
+    border-color: var(--color-macro);
+    color: var(--btn-on-accent);
+    font-weight: 600;
+  }
+
+  .btn-macro:hover {
+    filter: brightness(1.08);
+    background: var(--color-macro);
+  }
+
+  .btn-ghost {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .btn-ghost:hover {
+    background: var(--bg-elevated);
+  }
+
+  .pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.42rem 0.85rem;
+    min-block-size: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    color: var(--ink-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .pill-btn:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-elevated);
+  }
+
+  .pill-btn[aria-pressed="true"] {
+    background: var(--color-micro-soft);
+    color: var(--color-micro);
+    border-color: var(--color-micro-border);
+  }
+
+  .pill-btn.is-macro[aria-pressed="true"] {
+    background: var(--color-macro-soft);
+    color: var(--color-macro);
+    border-color: var(--color-macro-border);
+  }
+
+  /* Graph card shell */
+  .graph-figure {
+    margin: 1.5rem 0;
+    padding: 1.15rem 1.25rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .graph-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-block-end: 0.85rem;
+  }
+
+  .graph-title {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink-primary);
+  }
+
+  .graph-caption {
+    margin-block: 0.75rem 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+
+  .graph-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.85rem 1.25rem;
+    margin-block-start: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .control-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+  }
+
+  .control-label-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--ink-primary);
+  }
+
+  .control-value {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-micro);
+  }
+
+  .graph-svg-wrap {
+    inline-size: 100%;
+    overflow-x: auto;
+  }
+
+  .econ-svg {
+    inline-size: 100%;
+    block-size: auto;
+    font-family: var(--font-sans);
+    user-select: none;
+  }
+
+  /* Crisp text halo so SVG labels remain legible when intersecting curves or gridlines */
+  svg.econ-svg text {
+    paint-order: stroke;
+    stroke: var(--bg-surface);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
+  }
+
+  .graph-readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+    margin-block-start: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+  }
+
+  .readout-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--ink-secondary);
+  }
+
+  .readout-item strong {
+    font-family: var(--font-mono);
+    color: var(--ink-primary);
+  }
+}
+
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .prose {
+    max-inline-size: var(--reading-measure);
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+  }
+}
